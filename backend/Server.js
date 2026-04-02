@@ -14,7 +14,7 @@ const app = express();
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: 'http://localhost:5173', // Admin frontend Vite default
+origin: process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : ['http://localhost:5173', 'https://rms-project.vercel.app', 'https://rms-project.onrender.com'], // Multi-origin support for dev/prod
   credentials: true
 }));
 
