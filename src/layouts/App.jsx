@@ -1,78 +1,47 @@
- import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+
 import Navbar from "../components/Navbar";
- import Sidebar from "../components/Sidebar";
- import Footer from "../components/Footer"
-//  import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import axios from "axios";
-// import  { toast } from 'react-hot-toast';
+import Sidebar from "../components/Sidebar";
+import Footer from "../components/Footer"
 
+const AppLayout = () => {
+  const navigate = useNavigate();
 
- const AppLayout = () => {
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+  }, [navigate]);
 
-  const[user,setuser] = useState()
-  const navigate = useNavigate()
+  const storedUser = localStorage.getItem("user");
+  const hasToken = !!localStorage.getItem("accessToken");
 
-useEffect(() => {
-  const token = localStorage.getItem("accesstoken");
-
-  if (!token) {
-    navigate("/login");
-    return;
+  if (!hasToken) {
+    return <div>Redirecting to login...</div>;
   }
 
-  getUser(token);
-}, []);
-
-
-const getUser = async(token)=>{
-  try {
-
-axios.defaults.headers.common['Authorization'] = token;
-
-    const response= await axios.get("http://127.0.0.1:5000/user/get")
-    setuser(response.data)
-    console.log(response)
-  } catch (error) {
-   console.log("error get",error?.response?.data?.message)
-  }
-}
-
-
-
-
-    return(
-        <>
-        <div>
-         <div id="layout-wrapper">
-    <header id="page-topbar">
-      <div className="layout-width">
-      <Navbar user ={user}/>
+  return (
+    <>
+      <div id="layout-wrapper">
+        <header id="page-topbar">
+          <div className="layout-width">
+            <Navbar />
+          </div>
+        </header>
+        <Sidebar />
+        <div className="main-content">
+          <div className="page-content">
+            <Outlet/>
+          </div>
+          <Footer/>
+        </div>
       </div>
-    </header>
- 
-    <Sidebar/>
- 
-  
-    {/* ============================================================== */}
-    {/* Start right Content here */}
-    {/* ============================================================== */}
-   
-    <div className="main-content">
-      <div className="page-content">
-      
-        <Outlet/>
-        {/* container-fluid */}
-      </div>
-      {/* End Page-content */}   
-     <Footer/>
-    </div>
-    {/* end main content*/}
-  </div>
-  {/* END layout-wrapper */}
- 
-  </div> 
-        </>
-    )
-}
+    </>
+  );
+};
+
 export default AppLayout;
+

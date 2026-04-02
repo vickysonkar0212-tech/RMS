@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 // import axios from "axios";
 
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useGetAllfacultyMutation } from "../../../app/services/AuthApi";
-import { useDeletefacultyMutation } from "../../../app/services/AuthApi";
+import { useGetAllFacultyQuery, useDeleteFacultyMutation } from "../../../app/services/AuthApi";
+import toast from "react-hot-toast";
+
 
 
 const Faculty = () => {
@@ -11,42 +12,28 @@ const Faculty = () => {
 const { id } = useParams(); 
 
   
-const [GetAllfaculty] = useGetAllfacultyMutation()
-const [Deletefaculty] = useDeletefacultyMutation()
+const { data: facultyData, isLoading } = useGetAllFacultyQuery()
+  const [deleteFaculty] = useDeleteFacultyMutation()
 
   const navigate = useNavigate()
 
-  const [faculty, setFaculty] = useState([]);
+  const facultyList = facultyData?.data || [];
 
-  useEffect(() => {
-    const fetchFaculty = async () => {
-      try {
-        const response = await GetAllfaculty();
-        // console.log("Fetched students:", response.data.data);
-        setFaculty(response.data.data);
-        fetchFaculty()
-      } catch (error) {
-        console.error("Failed to fetch students", error);
-      }
-    };
 
-  
-    fetchFaculty();
-  }, []);
 
 
   const deleteSubmit = async (id) => {
       
     try {
-      await  Deletefaculty(id);
-      alert("Student Deleted");
+      await deleteFaculty(id).unwrap();
+      toast.success("Faculty deleted successfully");
       navigate("/faculty");
     } catch (error) {
+      toast.error(error.data?.message || "Delete failed");
       console.error(error);
+    }
+  };
 
-     
-    }
-    };
   return (
     <>
       <div className="row">
@@ -69,7 +56,7 @@ const [Deletefaculty] = useDeletefacultyMutation()
                       </Link>
                       <button
                         className="btn btn-soft-danger"
-                        onclick="deleteMultiple()"
+
                       >
                         <i className="ri-delete-bin-2-line" />
                       </button>
@@ -135,7 +122,7 @@ const [Deletefaculty] = useDeletefacultyMutation()
                       </tr>
                     </thead>
                     <tbody className="list form-check-all">
-                      {faculty.map((faculty, index) => (
+{facultyList.map((faculty, index) => (
                         <tr key={faculty._id}>
                           <th>
                             {index + 1}
@@ -194,19 +181,16 @@ const [Deletefaculty] = useDeletefacultyMutation()
                
               </div>
             </div>
-            {/* end card */}
+         
           </div>
-          {/* end col */}
+     
         </div>
-        {/* end col */}
+     
       </div>
 
 
 
     </>
   )
-
 }
-
-
 export default Faculty;

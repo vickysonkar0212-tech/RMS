@@ -3,116 +3,124 @@ import { createApi ,  fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const AuthApi = createApi({
   reducerPath: 'AuthApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://127.0.0.1:5000/' }),
+baseQuery: fetchBaseQuery({ 
+  baseUrl: 'http://127.0.0.1:5000/api/',
+  prepareHeaders: (headers, { getState }) => {
+  const token = localStorage.getItem('accessToken');
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    return headers;
+  }
+}),
   endpoints: builder => ({
 
     login: builder.mutation({
       query: (userdata) => ({
-        url : "/auth/login",
-        method : "POST",
-        body : userdata
-      })
+        url: "auth/login",
+        method: "POST",
+        body: userdata
+      }),
+      invalidatesTags: ['User']
     }),
- 
-    Create: builder.mutation({
-     query: (userdata) => ({
-    url : "/student/create",
-    method : "POST",
-    body : userdata
-   })
-   }),
 
-      GetAll: builder.mutation({
+    register: builder.mutation({
       query: (userdata) => ({
-        url : "/student/getAll",
-        method : "get",
-        body : userdata
+        url: "auth/register",
+        method: "POST",
+        body: userdata
       })
     }),
 
-      Get: builder.mutation({
-      query: ({id}) => ({
-        url : `/student/get/${id}`,
-        method : "get"
-        // body : id
+    completeRegister: builder.mutation({
+      query: (userdata) => ({
+        url: "auth/complete-register",
+        method: "POST",
+        body: userdata
       })
     }),
 
-  update: builder.mutation({
-  query: ({ id,userdata  }) => ({
-    url: `/student/update/${id}`,
+    students: builder.mutation({
+      query: (userdata) => ({
+        url: "students",
+        method: "POST",
+        body: userdata
+      })
+    }),
+
+    getAllStudents: builder.query({
+      query: () => "students/getAll",
+      providesTags: ['Students']
+    }),
+
+    getStudent: builder.query({
+      query: (id) => `students/get/${id}`
+    }),
+
+  updateStudent: builder.mutation({
+  query: ({ id, userdata }) => ({
+    url: `students/update/${id}`,
     method: "PUT",
-    body: userdata, // 🔥 this is the missing part!
+    body: userdata,
+  }),
+ }),
+
+  deleteStudent: builder.mutation({
+    query: (id) => ({
+      url: `students/${id}`,
+      method: "DELETE",
+    }),
   }),
 
- }),
-
-   Delete :builder.mutation({
-        query:({id}) => ({
-          url: `/student/delete/${id}`,
-          method : "delete",
-          // body :userdata
-        })
-      }),
 
 
 
-
-    Createfaculty: builder.mutation({
-  query: (userdata) => ({
-    url : "/faculty/create",
-    method : "POST",
-    body : userdata
-  })
-}),
-
-      GetAllfaculty: builder.mutation({
+    createFaculty: builder.mutation({
       query: (userdata) => ({
-        url : "/faculty/getAll",
-        method : "get",
+        url: "/faculty/create",
+        method: "POST",
+        body: userdata
+      })
+    }),
+
+    getAllFaculty: builder.query({
+      query: () => "/faculty/getAll",
+      providesTags: ['Faculty']
+    }),
+
+    getFaculty: builder.query({
+      query: (id) => `/faculty/get/${id}`
+    }),
+
+    updateFaculty: builder.mutation({
+      query: ({ id , userdata }) => ({
+        url: `/faculty/update/${id}`,
+        method: "PUT",
         body : userdata
       })
     }),
 
-      Getfaculty: builder.mutation({
-      query: ({id}) => ({
-        url : `/faculty/get/${id}`,
-        method : "get",
-        // body : userdata
-      })
-    }),
-
-     Updatefaculty : builder.mutation({
-      query :({ id , userdata }) => ({
-        url :`/faculty/update/${id}`,
-        method : "PUT",
-        body : userdata
-      })
- }),
-
-   Deletefaculty :builder.mutation({
-        query:(id)=>({
-          url: `/faculty/delete/${id}`,
-          method : "delete",
-          // body :userdata
-        })
-      })
-
-
+    deleteFaculty: builder.mutation({
+      query: (id) => ({
+        url: `faculty/${id}`,
+        method: "DELETE"
+      }),
+    })
   })
 })
 
 export const {
-   useLoginMutation,
-   useCreateMutation,
- useGetAllMutation,
- useUpdateMutation,
- useDeleteMutation,
- useGetMutation,
-  useCreatefacultyMutation,
- useGetAllfacultyMutation,
- useUpdatefacultyMutation,
- useDeletefacultyMutation,
- useGetfacultyMutation,
-
+  useLoginMutation,
+  useRegisterMutation,
+  useCompleteRegisterMutation,
+  useStudentsMutation,
+  useGetAllStudentsQuery,
+  useGetStudentQuery,
+  useUpdateStudentMutation,
+  useDeleteStudentMutation,
+  useCreateFacultyMutation,
+  useGetAllFacultyQuery,
+  useGetFacultyQuery,
+  useUpdateFacultyMutation,
+  useDeleteFacultyMutation,
 } = AuthApi

@@ -1,20 +1,23 @@
- 
-//  import { useNavigate } from "react-router-dom";
- const Navbar = ({user}) => {
 
-  console.log(user)
-  // const navigate = useNavigate()
+import { useSelector } from 'react-redux';
 
-const handleLogout = () => {
-
- const confirm = window.confirm("Are You Sure")
- if(confirm) {
-  localStorage.removeItem("accesstoken")
-  window.location.reload()
-  // navigate("/")
- }
-}
-
+const Navbar = () => {
+const token = localStorage.getItem('accessToken');
+  const storedUser = localStorage.getItem('user');
+  const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+  const user = parsedUser?.user || parsedUser; // response.data.user OR direct user object
+console.log("PARSED storedUser:", parsedUser);
+  console.log("FINAL user for display:", user);
+  console.log("STORAGE token:", token);
+  console.log("user email:", user?.email || user?.data?.email || 'NO EMAIL FOUND');
+  console.log("user Username:", user?.Username || user?.data?.Username || user?.name || 'NO USERNAME');
+  const handleLogout = () => {
+    if (window.confirm("Are you sure?")) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      window.location.reload();
+    }
+  };
 
     return(
         <>
@@ -1216,17 +1219,13 @@ const handleLogout = () => {
                 aria-expanded="false"
               >
                 <span className="d-flex align-items-center">
-                  <img
-                    className="rounded-circle header-profile-user"
-                    src="http://www.gravatar.com/avatar/"
-                    alt="Header Avatar"
-                  />
+                  <img className="rounded-circle header-profile-user" src="http://www.gravatar.com/avatar/" alt="Header Avatar" />
                   <span className="text-start ms-xl-2">
                     <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">
                   {user?.Username} 
                     </span>
                     <span className="d-none d-xl-block ms-1 fs-12 user-name-sub-text">
-                     {user?.email} 
+                     {user?.role} 
                  
                     </span>
                   </span>
@@ -1269,7 +1268,7 @@ const handleLogout = () => {
                   <i className="mdi mdi-lock text-muted fs-16 align-middle me-1" />{" "}
                   <span className="align-middle">Lock screen</span>
                 </a>
-                <button className="dropdown-item"   onClick={handleLogout}>
+                <button className="dropdown-item"onClick={handleLogout}>
                   <i className="mdi mdi-logout text-muted fs-16 align-middle me-1" />{" "}
                   <span className="align-middle" data-key="t-logout">
                     Logout

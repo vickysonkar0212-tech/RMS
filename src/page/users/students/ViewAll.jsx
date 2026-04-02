@@ -1,30 +1,25 @@
 // import axios from "axios";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useGetAllMutation } from "../../../app/services/AuthApi";
 
+import { useState, useEffect } from "react";
+
+import {useGetAllStudentsQuery} from "../../../app/services/AuthApi";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Students = () => {
 
-  const [GetAll] = useGetAllMutation()
+  const { data: studentsData, isLoading } = useGetAllStudentsQuery()
 
   const [students, setStudents] = useState([]);
 
   // Fetch data on component mount
   
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const res = await GetAll();
-        console.log("Fetched students:", res.data);
-        setStudents(res.data.data);
-      } catch (error) {
-        console.error("Failed to fetch students", error?.res?.data?.data?.message);
-      }
-    };
-  console.log("student",students)
-    fetchStudents();
-  }, []);
+    if (studentsData?.data) {
+      setStudents(studentsData.data);
+      console.log("Fetched students:", studentsData.data);
+    }
+  }, [studentsData]);
 
   return (
     <>

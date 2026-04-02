@@ -7,15 +7,14 @@ const Authlayout = () => {
 
   useEffect ( () =>  {
      
-    const token = localStorage.getItem("accesstoken")
+const token = localStorage.getItem("accessToken")
   if(token) {
     navigate("/")
   }
     
   } , [])
   
-
-    return (
+  return (
         <>
 
 

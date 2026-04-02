@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetfacultyMutation, useUpdatefacultyMutation } from "../../../app/services/AuthApi";
+import { useGetFacultyQuery, useUpdateFacultyMutation } from "../../../app/services/AuthApi";
 
 const FacultyEdit = () => {
 
   const { id } = useParams();
-  const [Getfaculty] = useGetfacultyMutation();
-  const [Updatefaculty] = useUpdatefacultyMutation();
+  const { data: facultyData, isLoading } = useGetFacultyQuery(id);
+  const [updateFaculty] = useUpdateFacultyMutation();
   const navigate = useNavigate();
 
   const [faculty, setFaculty] = useState({
@@ -28,19 +28,12 @@ const FacultyEdit = () => {
   });
 
   useEffect(() => {
-    const fetchFaculty = async () => {
-      try {
-        const res = await Getfaculty({ id });
-        // const fetched = res.data || {};
-        setFaculty(res.data.data)
-        // console.log("Fetched:", res.data);
-      } catch (err) {
-        toast.error("Failed to fetch faculty");
-        console.error(err);
-      }
-    };
-    fetchFaculty();
-  }, [id]);
+    if (facultyData) {
+      // setFaculty(facultyData);
+      setFaculty(facultyData?.data);
+      console.log("FACULTY DATA 👉", facultyData);
+    }
+  }, [facultyData]);
 
   // const handlechange = (e, section = "", field = "") => {
   //   const { name, value } = e.target;
@@ -84,19 +77,18 @@ const FacultyEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-    const res =   await Updatefaculty({ id, userdata:faculty });
-
-    
+      await updateFaculty({ id, userdata: faculty });
       toast.success("Faculty updated successfully");
       navigate("/faculty");
     } catch (err) {
       toast.error("Update failed");
-      // console.error(err);
+      console.error(err);
     }
   };
 
   return (
     <>
+    
       <form onSubmit={handleSubmit}>
         <div className="row">
           {/* First Name */}
@@ -235,7 +227,7 @@ const FacultyEdit = () => {
               name="street"
               className="form-control"
               placeholder="Enter your street"
-              value={faculty.address.street}
+            value={faculty.address?.street || ''}
               onChange={(e) => handlechange(e, "address", "street")}
               id="addressInput"
             />
@@ -249,7 +241,7 @@ const FacultyEdit = () => {
               name="city"
               className="form-control"
               placeholder="Enter your city"
-              value={faculty.address.city}
+            value={faculty.address?.city || ''}
               onChange={(e) => handlechange(e, "address", "city")}
               id="cityInput"
             />
@@ -263,7 +255,7 @@ const FacultyEdit = () => {
               name="state"
               className="form-control"
               placeholder="Enter your state"
-              value={faculty.address.state}
+            value={faculty.address?.state || ''}
               onChange={(e) => handlechange(e, "address", "state")}
               id="stateInput"
             />

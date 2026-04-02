@@ -1,11 +1,13 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useCreateMutation } from "../../../app/services/AuthApi";
+import { useStudentsMutation } from "../../../app/services/AuthApi";
 
 const StudentAdd = () => {
+  const navigate = useNavigate();
 
-  const [ create ] = useCreateMutation()
+  const [ createStudent, { isLoading } ] = useStudentsMutation()
 
 
   const [firstname, setFirstname] = useState('')
@@ -23,7 +25,7 @@ const StudentAdd = () => {
     country: ""
   })
   const [program, setProgram] = useState('')
-  const [course, setCourse] = useState('[]')
+  const [course, setCourse] = useState('')
   const [guardianName, setGuardianName] = useState({
     name: "",
     relationship: "",
@@ -31,11 +33,11 @@ const StudentAdd = () => {
   })
   // const [companyName, setCompanyName] = useState('')
 
-  const handlSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await create({
+      const response = await createStudent({
         firstname,
         lastname,
         email,
@@ -47,23 +49,23 @@ const StudentAdd = () => {
         program,
         course,
         guardianName
-      });
-      console.log(response.data);
-      toast.success(response?.data?.message);
+      }).unwrap();
+      toast.success(response?.message || response?.data?.message);
+      navigate("/users/students");
     } catch (error) {
-      console.error("error", error?.response?.data?.message);
-      toast.error(error?.response?.data?.message);
+      console.error("error", error.data?.message || error.error || error.message || error);
+      toast.error(error.data?.message || error.error || error.message || "An error occurred");
     }
   };
-  const isDisable = firstname && lastname && email && course && dateOfbirth ;
+  const isDisabled = firstname && lastname && email && phoneNumber && gender && password && dateOfbirth && program && course;
   return (
 
     <>
       <div className="col-5 mx-auto">
         <h2 className="fs-4 text-center mb-4"> Student Add Form</h2>
         <div className="card">
-          <div className="card-body">
-            <form  onSubmit={handlSubmit}>
+          <form className="card-body" onSubmit={handleSubmit}>
+             
               <div className="row">
                 <div className="col-6">
                   <div className="mb-3">
@@ -240,7 +242,7 @@ const StudentAdd = () => {
                     <label htmlFor="ForminputState" className="form-label">
                       Courses
                     </label>
-                    <select id="ForminputState" className="form-select" value={course}
+                    <select id="ForminputState" className="form-select" value={course || ''}
                       onChange={(e) => setCourse(e.target.value)}>
                       <option selected="">Choose...</option>
                       <option>Full Stack Devlopment</option>
@@ -273,7 +275,7 @@ const StudentAdd = () => {
                 {/*submit*/}
                 <div className="col-lg-12">
                   <div className="text-end">
-                    <button type="submit" disabled={!isDisable}
+                    <button type="submit" disabled={!isDisabled}
                       className="btn w-100 btn-primary">
                       Submit
                     </button>
@@ -287,7 +289,7 @@ const StudentAdd = () => {
           </div>
         </div>
 
-      </div>
+      
 
     </>
   )

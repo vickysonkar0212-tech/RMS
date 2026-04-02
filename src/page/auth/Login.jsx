@@ -1,37 +1,45 @@
-import axios from "axios"
+// Login Component - Fixed token storage
 import { useState } from 'react';
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { useLoginMutation } from "../../app/services/AuthApi";
-// import { useEffect } from "react";
+import { useLoginMutation, useRegisterMutation, useCompleteRegisterMutation } from "../../app/services/AuthApi";
 
 const Login = () => {
-
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate()
+  const [password, setPassword] = useState(''); 
+  const navigate = useNavigate();
 
   const [ login ] = useLoginMutation()
+  const [ register ] = useRegisterMutation()
+  const [ completeRegister ] = useCompleteRegisterMutation()
 
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
+const handleSubmit = async (event) => {
+    event.preventDefault();
 
     try {
-
-       const response = await login({email , password})
-
-      // const response = await axios.post("http://127.0.0.1:5200/auth/login", { email, password })
-      // console.log(response.data)
-      toast.success(response?.data?.message)
-      // localStorage.setItem("accesstoken", response.data.token)
-      localStorage.setItem("accesstoken", response?.data?.data?.token);
-      navigate("/")
+      const response = await login({email, password}).unwrap();
+      console.log('Full login response:', response); // DEBUG: Check structure
+      
+      // Store token - confirmed working from your logs
+      const token = response?.data?.token;
+      localStorage.setItem("accessToken", token);
+      
+      // Store COMPLETE response.data (has user info)
+      localStorage.setItem("user", JSON.stringify(response.data));
+      
+      console.log('Stored user:', JSON.parse(localStorage.getItem("user"))); // DEBUG
+      
+      toast.success(response?.data?.message);
+      
+      setTimeout(() => {
+        navigate("/");
+      }, 100);
+      
     } catch (error) {
-      console.log("error", error.response.data.message)
-      toast.error(error?.response?.data?.message)
+      toast.error(error?.data?.message || 'Login failed');
     }
   }
+
   return (
     <>
       <div className="row justify-content-center">
@@ -103,3 +111,4 @@ const Login = () => {
   )
 }
 export default Login;
+

@@ -1,11 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useCreatefacultyMutation } from "../../../app/services/AuthApi";
+import { useCreateFacultyMutation } from "../../../app/services/AuthApi";
+import {useNavigate } from "react-router-dom";
 
 const FacultyAdd = () => {
 
-  const [Createfaculty] = useCreatefacultyMutation()
+  const [Createfaculty] = useCreateFacultyMutation()
   const [firstname, setFirstname] = useState('')
   const [lastname, setLastname] = useState('')
   const [email, setEmail] = useState('')
@@ -21,6 +22,8 @@ const FacultyAdd = () => {
   const [dateofbirth, setDateOfBirth] = useState('')
   const [program, setProgram] = useState('')
   const [course, setCourse] = useState('')
+const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -39,21 +42,21 @@ const FacultyAdd = () => {
         address,
         course,
         program
-      })
+      }).unwrap();
       // console.log("fetch", response)
-      toast.success(response?.data?.message)
+   toast.success(response?.message || "Faculty added successfully");
       // toast.success(response?.data?.message)
 
       //  toast.success(response.data.message); 
 
 
-
+navigate("/faculty");
 
     } catch (error) {
 
       // toast.error(error?.response?.data?.message || "Something went wrong");
 
-      toast.error(error?.response?.data?.message);
+      toast.error(error.data?.message || error.error || error.message || "An error occurred");
     }
 
   }

@@ -1,21 +1,23 @@
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useEffect } from "react";
-import { useDeleteMutation } from "../../../app/services/AuthApi";
+import {   useDeleteStudentMutation } from "../../../app/services/AuthApi";
 
 const Remove = () => {
   const {id} = useParams();
   
   const navigate = useNavigate();
-  const [Delete] =useDeleteMutation()
+  const [Delete] =  useDeleteStudentMutation()
   const deleteStudent = async (id) => {
     try {
-   const response = await Delete({id});
+  //  const response = await Delete({id});
+  const response = await Delete(id).unwrap();
+     console.log("DELETE RESPONSE 👉", response);
       toast.success("Student deleted successfully");
       navigate("/users/students");
-      console.log( "delete" ,  response.data)
+      console.log( "delete" ,  response)
     } catch (err) {
-      toast.error(err);
+   toast.error(err?.data?.message || "Delete failed");
       navigate("/users/students");
     }
   };
