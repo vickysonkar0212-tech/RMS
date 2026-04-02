@@ -6,6 +6,7 @@
   "main": "Server.js",
   "scripts": {
     "start": "node Server.js",
+      "build": "echo build",
     "dev": "nodemon Server.js"
   },
   "keywords": ["rms", "express", "mongoose", "auth"],
